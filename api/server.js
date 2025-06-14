@@ -26,9 +26,7 @@ export default async function handler(req, res) {
       font-family: 'Courier New', monospace;
       padding: 20px;
     }
-    h2 {
-      color: #00e676;
-    }
+    h2 { color: #00e676; }
     textarea, input[type="file"] {
       background-color: #1e1e1e;
       color: #fff;
@@ -50,9 +48,7 @@ export default async function handler(req, res) {
       cursor: pointer;
       transition: background-color 0.3s;
     }
-    button:hover {
-      background-color: #00838f;
-    }
+    button:hover { background-color: #00838f; }
     table {
       width: 100%;
       margin-top: 20px;
@@ -96,6 +92,7 @@ export default async function handler(req, res) {
   <button onclick="loadFromFiles()">Gabungkan Dari File</button>
   <button onclick="startCheck()">Mulai Cek</button>
   <button onclick="copyToClipboard()">Salin Proxy Aktif</button>
+  <button onclick="copyIpPortOnly()">Salin IP:PORT Aktif</button>
   <button onclick="downloadTxt()">Unduh .txt</button>
 
   <div id="stats" style="margin-top: 20px; font-size: 16px;">
@@ -248,6 +245,17 @@ export default async function handler(req, res) {
     function copyToClipboard() {
       const proxies = getActiveProxies().join('\\n');
       navigator.clipboard.writeText(proxies).then(() => alert('Disalin ke clipboard!'));
+    }
+
+    function copyIpPortOnly() {
+      const rows = Array.from(document.querySelectorAll('#result tr'));
+      const proxies = rows
+        .filter(r => r.querySelector('.green'))
+        .map(r => {
+          const cells = r.querySelectorAll('td');
+          return \`\${cells[1].textContent}:\${cells[2].textContent}\`;
+        });
+      navigator.clipboard.writeText(proxies.join('\\n')).then(() => alert(\`\${proxies.length} IP:PORT aktif disalin!\`));
     }
 
     function downloadTxt() {
