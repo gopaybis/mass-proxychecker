@@ -1,20 +1,22 @@
-export default async function handler(req, res) {
-  if (req.method === "POST") {
-    try {
-      const { ip, port } = req.body;
-      const url = `https://apihealtcheck.vercel.app/api/v1?ip=${ip}&port=${port}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      res.setHeader("Content-Type", "application/json");
-      return res.status(200).json(data);
-    } catch {
-      return res.status(500).json({ error: true });
+export default {
+  async fetch(request) {
+    if (request.method === "POST") {
+      try {
+        const { ip, port } = await request.json();
+        const url = `https://apihealtcheck.vercel.app/api/v1?ip=${ip}&port=${port}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        return new Response(JSON.stringify(data), {
+          headers: { "Content-Type": "application/json" }
+        });
+      } catch {
+        return new Response(JSON.stringify({ error: true }), {
+          headers: { "Content-Type": "application/json" }
+        });
+      }
     }
-  }
 
-  // Jika metode selain POST (GET), kembalikan halaman HTML
-  res.setHeader("Content-Type", "text/html");
-  res.status(200).send(`<!DOCTYPE html>
+    return new Response(`<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -91,11 +93,11 @@ export default async function handler(req, res) {
 </head>
 <body>
   <h2>🔥 Proxy Checker</h2>
-  <textarea id="input" rows="6" placeholder="Masukkan proxy manual, contoh: IP:PORT\n..."></textarea>
+  <textarea id="input" rows="6" placeholder="Masukkan proxy manual, contoh: IP:PORT\\n..."></textarea>
   <input type="file" id="fileInput" multiple accept=".txt" /><br/>
   <button onclick="loadFromFiles()">Gabungkan Dari File</button>
   <button onclick="startCheck()">Mulai Cek</button>
-  <button onclick="copyToClipboard()">Salin Proxy Aktif</button>
+  <button onclick="copyToClipboard()">Salin IP:PORT Aktif</button>
   <button onclick="downloadTxt()">Unduh .txt</button>
 
   <div id="stats" style="margin-top: 20px; font-size: 16px;">
@@ -231,17 +233,7 @@ export default async function handler(req, res) {
         .filter(r => r.querySelector('.green'))
         .map(r => {
           const cells = r.querySelectorAll('td');
-          const country = (cells[4].textContent || '').split(' ')[0];
-          return [
-            cells[1].textContent,
-            cells[2].textContent,
-            country || '-',
-            cells[5].textContent || '-'
-          ].join(',');
-        }).sort((a, b) => {
-          const aCode = a.split(',')[2] || '';
-          const bCode = b.split(',')[2] || '';
-          return aCode.localeCompare(bCode);
+          return cells[1].textContent + ':' + cells[2].textContent;
         });
     }
 
@@ -260,5 +252,8 @@ export default async function handler(req, res) {
     }
   </script>
 </body>
-</html>`);
+</html>`, {
+      headers: { "Content-Type": "text/html" }
+    });
+  }
 }
