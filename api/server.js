@@ -90,7 +90,7 @@ export default async function handler(req, res) {
   </style>
 </head>
 <body>
-  <h2>ðŸ”¥ Proxy Checker</h2>
+  <h2>🔥 Proxy Checker</h2>
   <textarea id="input" rows="6" placeholder="Masukkan proxy manual, contoh: IP:PORT\n..."></textarea>
   <input type="file" id="fileInput" multiple accept=".txt" /><br/>
   <button onclick="loadFromFiles()">Gabungkan Dari File</button>
